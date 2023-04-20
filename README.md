@@ -206,7 +206,7 @@ character.level // 3
 Класс `Character` был спроектирован как базовый, чтобы вы могли унаследовать от него своих 
 персонажей. Поэтому неплохо бы запретить создавать объекты этого класса
 через `new Character(level)`, но при этом создание наследников должно работать 
-без проблем: `new Daemon`, где `class Daemon extends Character`. 
+без проблем: `new Daemon`, где `class Daemon extends Character`.
 
 Ознакомьтесь с документацией на [new.target](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/new.target) 
 и реализуйте подобную логику, выбрасывая ошибку в конструкторе `Character`.
