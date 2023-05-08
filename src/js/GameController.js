@@ -21,11 +21,11 @@ export default class GameController {
     const playerChar = [Bowman, Swordsman, Magician];
     const compChar = [Daemon, Undead, Vampire];
 
-    const playerTeam = generateTeam(playerChar, 4, this.gamePlay.boardSize * 2);
-    const compTeam = generateTeam(compChar, 4, this.gamePlay.boardSize * 2);
+    const playerTeam = generateTeam(playerChar, 4, 2);
+    const compTeam = generateTeam(compChar, 4, 2);
 
-    const positionsPlayer = this.positionsPlayer();
-    const positionsComp = this.positionsComputer();
+    const positionsPlayer = this.positionsPlayer(2);
+    const positionsComp = this.positionsComputer(2);
 
     const positionsTeamPlayers = playerTeam.characters.map(
       (el, index) => new PositionedCharacter(el, positionsPlayer[index])
@@ -40,26 +40,38 @@ export default class GameController {
     // TODO: load saved stated from stateService
   }
 
-  positionsPlayer() {
+  positionsPlayer(count) {
     const positions = [];
+    const positionsRandom = [];
     let i = 0;
     while (i < this.gamePlay.boardSize ** 2) {
       positions.push(i);
       positions.push(i + 1);
       i += this.gamePlay.boardSize;
     }
-    return positions;
+    for (let i = 0; i < count; i++) {
+      positionsRandom.push(
+        positions[Math.floor(Math.random() * positions.length)]
+      );
+    }
+    return positionsRandom;
   }
 
-  positionsComputer() {
+  positionsComputer(count) {
     const positions = [];
+    const positionsRandom = [];
     let i = this.gamePlay.boardSize - 2;
     while (i < this.gamePlay.boardSize ** 2) {
       positions.push(i);
       positions.push(i + 1);
       i += this.gamePlay.boardSize;
     }
-    return positions;
+    for (let i = 0; i < count; i++) {
+      positionsRandom.push(
+        positions[Math.floor(Math.random() * positions.length)]
+      );
+    }
+    return positionsRandom;
   }
 
   onCellClick(index) {
