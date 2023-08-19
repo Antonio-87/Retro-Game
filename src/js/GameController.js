@@ -56,8 +56,8 @@ export default class GameController {
 
   positionsPlayer(count) {
     const positions = [];
-    const positionsRandom = new Set([]);
-    const listPosition = [...positionsRandom];
+    let positionsRandom = new Set([]);
+    let listPosition = [];
     let i = 0;
     while (i < this.gamePlay.boardSize ** 2) {
       positions.push(i);
@@ -68,14 +68,15 @@ export default class GameController {
       positionsRandom.add(
         positions[Math.floor(Math.random() * positions.length)]
       );
+      listPosition = [...positionsRandom];
     }
     return listPosition;
   }
 
   positionsComputer(count) {
     const positions = [];
-    const positionsRandom = new Set([]);
-    const listPosition = [...positionsRandom];
+    let positionsRandom = new Set([]);
+    let listPosition = [];
     let i = this.gamePlay.boardSize - 2;
     while (i < this.gamePlay.boardSize ** 2) {
       positions.push(i);
@@ -86,13 +87,14 @@ export default class GameController {
       positionsRandom.add(
         positions[Math.floor(Math.random() * positions.length)]
       );
+      listPosition = [...positionsRandom];
     }
-    return [...positionsRandom];
+    return listPosition;
   }
 
   onCellClick(index) {
     // TODO: react to click
-    const cellPlayer = this.#positionsPlayer[index];
+    const cellPlayer = this.#positionsPlayer.find((el) => el === index);
     if (cellPlayer) {
       if (this.#activeCharacter)
         this.gamePlay.deselectCell(this.#activeCharacter);
@@ -108,6 +110,8 @@ export default class GameController {
   onCellEnter(index) {
     // TODO: react to mouse enter
     const cell = this.#positionTeamList.find((el) => el.position === index);
+    const player = this.#positionsPlayer.find((el) => el === index);
+    const comp = this.#positionsComp.find((el) => el === index);
     let character;
     if (cell) {
       character = cell.character;
@@ -116,15 +120,16 @@ export default class GameController {
       const message = GameController.getCharacterInfo(character);
       this.gamePlay.showCellTooltip(message, index);
     }
-    if (this.#activeCharacter && this.#activeCharacter !== index) {
-      if (character) {
+    if (this.#activeCharacter) {
+      if (this.#activeCharacter !== index && player) {
         this.gamePlay.setCursor("pointer");
-      } else {
+      }
+      if (this.#activeCharacter !== index && !cell) {
+        if (this.selected) this.gamePlay.deselectCell(this.selected);
         this.gamePlay.setCursor("pointer");
         this.gamePlay.selectCell(index, "green");
         this.selected = index;
       }
-      if (this.selected !== index) this.gamePlay.deselectCell(this.selected);
     }
   }
 

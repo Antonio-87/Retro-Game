@@ -29,9 +29,10 @@ export function generateTeam(allowedTypes, maxLevel, characterCount) {
   // TODO: write logic here
   let teamList = [];
   // eslint-disable-next-line no-const-assign
-  for (let i = 1; i <= characterCount; i++) {
+  for (let i = 0; teamList.length < characterCount; i++) {
     const character = characterGenerator(allowedTypes, maxLevel);
-    teamList.push(character.next().value);
+    if (!teamList.find((el) => el.type === character.next().value.type))
+      teamList.push(character.next().value);
   }
   return new Team(teamList);
 }
