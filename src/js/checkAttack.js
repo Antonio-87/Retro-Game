@@ -1,4 +1,4 @@
-export default function checkMove(
+export default function checkAttack(
   characterType,
   currentPos,
   targetPos,
@@ -9,7 +9,7 @@ export default function checkMove(
     Math.floor(targetPos / boardSize) - Math.floor(currentPos / boardSize)
   );
   if (characterType === "swordsman" || characterType === "andead") {
-    if (dx <= 4 && dy <= 4) {
+    if (dx <= 1 && dy <= 1) {
       return true;
     }
   } else if (characterType === "bowman" || characterType === "vampire") {
@@ -17,7 +17,7 @@ export default function checkMove(
       return true;
     }
   } else if (characterType === "magician" || characterType === "daemon") {
-    if (dx <= 1 && dy <= 1) {
+    if (dx <= 4 && dy <= 4) {
       return true;
     }
   }

@@ -9,6 +9,8 @@ import PositionedCharacter from "./PositionedCharacter";
 import { generateTeam } from "./generators";
 import themes from "./themes";
 import GamePlay from "./GamePlay";
+import checkMove from "./checkMove";
+import checkAttack from "./checkAttack";
 
 export default class GameController {
   #positionTeamList;
@@ -124,11 +126,40 @@ export default class GameController {
       if (this.#activeCharacter !== index && player) {
         this.gamePlay.setCursor("pointer");
       }
-      if (this.#activeCharacter !== index && !cell) {
-        if (this.selected) this.gamePlay.deselectCell(this.selected);
-        this.gamePlay.setCursor("pointer");
-        this.gamePlay.selectCell(index, "green");
-        this.selected = index;
+      if (this.#activeCharacter !== index) {
+        if (this.selected) {
+          this.gamePlay.deselectCell(this.selected);
+          this.gamePlay.setCursor("auto");
+        }
+        const activCharacter = this.#positionTeamList.find(
+          (el) => el.position === this.#activeCharacter
+        );
+        const youCanGo = checkMove(
+          activCharacter.character.type,
+          this.#activeCharacter,
+          index,
+          this.gamePlay.boardSize
+        );
+        const youCanAttack = checkAttack(
+          activCharacter.character.type,
+          this.#activeCharacter,
+          index,
+          this.gamePlay.boardSize
+        );
+        if (youCanGo === true && !cell) {
+          this.gamePlay.setCursor("pointer");
+          this.gamePlay.selectCell(index, "green");
+          this.selected = index;
+        }
+        if (youCanAttack === true && cell && comp) {
+          this.gamePlay.setCursor("crosshair");
+          this.gamePlay.selectCell(index, "red");
+          this.selected = index;
+        }
+        if (comp && (youCanGo === false || youCanAttack === false)) {
+          this.gamePlay.setCursor("not-allowed");
+          this.selected = index;
+        }
       }
     }
   }
