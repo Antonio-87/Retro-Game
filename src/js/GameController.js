@@ -97,15 +97,37 @@ export default class GameController {
   onCellClick(index) {
     // TODO: react to click
     const cellPlayer = this.#positionsPlayer.find((el) => el === index);
+    const cellComp = this.#positionsComp.find((el) => el === index);
+    const green =
+      this.gamePlay.cells[index].classList.contains("selected-green");
     if (cellPlayer) {
       if (this.#activeCharacter)
         this.gamePlay.deselectCell(this.#activeCharacter);
       this.gamePlay.selectCell(index);
       this.#activeCharacter = index;
-    } else {
+    }
+    if (cellComp) {
       if (this.#activeCharacter)
         this.gamePlay.deselectCell(this.#activeCharacter);
       GamePlay.showError(`No character or it is an enemy character!`);
+    }
+
+    if (!cellComp && !cellPlayer && this.#activeCharacter && green) {
+      const activCharacter = this.#positionTeamList.find(
+        (el) => el.position === this.#activeCharacter
+      );
+      if (activCharacter) {
+        this.#positionsPlayer.map((el) => {
+          if (el === this.#activeCharacter) el = index;
+          console.log(index);
+        });
+        console.log(this.#positionsPlayer);
+        activCharacter.position = this.selected;
+        this.gamePlay.redrawPositions(this.#positionTeamList);
+        this.gamePlay.deselectCell(this.#activeCharacter);
+        this.gamePlay.deselectCell(this.selected);
+        this.#activeCharacter = null;
+      }
     }
   }
 
@@ -160,6 +182,8 @@ export default class GameController {
           this.gamePlay.setCursor("not-allowed");
           this.selected = index;
         }
+      } else {
+        if (this.selected) this.gamePlay.deselectCell(this.selected);
       }
     }
   }
