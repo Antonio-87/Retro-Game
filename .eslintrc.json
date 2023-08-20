@@ -20,12 +20,5 @@
       "extends": ["plugin:jest/recommended"],
       "rules": { "jest/prefer-expect-assertions": "off" }
     }
-  ],
-  "jest/expect-expect": [
-    "error",
-    {
-      "assertFunctionNames": ["expect"],
-      "additionalTestBlockFunctions": []
-    }
   ]
 }
