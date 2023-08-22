@@ -100,15 +100,17 @@ export default class GameController {
     const cellComp = this.#positionsComp.find((el) => el === index);
     const green =
       this.gamePlay.cells[index].classList.contains("selected-green");
+    const red = this.gamePlay.cells[index].classList.contains("selected-red");
     if (cellPlayer) {
       if (this.#activeCharacter)
         this.gamePlay.deselectCell(this.#activeCharacter);
       this.gamePlay.selectCell(index);
       this.#activeCharacter = index;
     }
-    if (cellComp) {
+    if (cellComp && !red) {
       if (this.#activeCharacter)
         this.gamePlay.deselectCell(this.#activeCharacter);
+      this.#activeCharacter = null;
       GamePlay.showError(`No character or it is an enemy character!`);
     }
 
@@ -116,18 +118,14 @@ export default class GameController {
       const activCharacter = this.#positionTeamList.find(
         (el) => el.position === this.#activeCharacter
       );
-      if (activCharacter) {
-        this.#positionsPlayer.map((el) => {
-          if (el === this.#activeCharacter) el = index;
-          console.log(index);
-        });
-        console.log(this.#positionsPlayer);
-        activCharacter.position = this.selected;
-        this.gamePlay.redrawPositions(this.#positionTeamList);
-        this.gamePlay.deselectCell(this.#activeCharacter);
-        this.gamePlay.deselectCell(this.selected);
-        this.#activeCharacter = null;
-      }
+      const activeIndex = this.#positionsPlayer.indexOf(this.#activeCharacter);
+      this.#positionsPlayer[activeIndex] = index;
+      activCharacter.position = index;
+      this.gamePlay.redrawPositions(this.#positionTeamList);
+      this.gamePlay.deselectCell(this.#activeCharacter);
+      this.gamePlay.deselectCell(this.selected);
+      this.#activeCharacter = index;
+      this.gamePlay.selectCell(index);
     }
   }
 
@@ -149,7 +147,7 @@ export default class GameController {
         this.gamePlay.setCursor("pointer");
       }
       if (this.#activeCharacter !== index) {
-        if (this.selected) {
+        if (this.selected && this.selected !== this.#activeCharacter) {
           this.gamePlay.deselectCell(this.selected);
           this.gamePlay.setCursor("auto");
         }
@@ -178,13 +176,13 @@ export default class GameController {
           this.gamePlay.selectCell(index, "red");
           this.selected = index;
         }
-        if (comp && (youCanGo === false || youCanAttack === false)) {
+        if (comp && youCanAttack === false) {
           this.gamePlay.setCursor("not-allowed");
           this.selected = index;
         }
-      } else {
-        if (this.selected) this.gamePlay.deselectCell(this.selected);
       }
+    } else {
+      if (this.selected) this.gamePlay.deselectCell(this.selected);
     }
   }
 
