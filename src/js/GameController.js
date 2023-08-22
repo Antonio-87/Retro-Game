@@ -11,18 +11,21 @@ import themes from "./themes";
 import GamePlay from "./GamePlay";
 import checkMove from "./checkMove";
 import checkAttack from "./checkAttack";
+import GameState from "./GameState";
 
 export default class GameController {
   #positionTeamList;
   #activeCharacter;
   #positionsPlayer;
   #positionsComp;
+  #gameState;
   constructor(gamePlay, stateService) {
     this.gamePlay = gamePlay;
     this.stateService = stateService;
     this.#positionTeamList;
     this.#positionsPlayer;
     this.#positionsComp;
+    this.#gameState;
 
     this.#activeCharacter = null;
     this.selected = null;
@@ -111,6 +114,7 @@ export default class GameController {
       if (this.#activeCharacter)
         this.gamePlay.deselectCell(this.#activeCharacter);
       this.#activeCharacter = null;
+      this.gamePlay.setCursor("auto");
       GamePlay.showError(`No character or it is an enemy character!`);
     }
 
@@ -124,8 +128,22 @@ export default class GameController {
       this.gamePlay.redrawPositions(this.#positionTeamList);
       this.gamePlay.deselectCell(this.#activeCharacter);
       this.gamePlay.deselectCell(this.selected);
-      this.#activeCharacter = index;
-      this.gamePlay.selectCell(index);
+      this.#activeCharacter = null;
+      this.#gameState = GameState.from({ currentPlayer: "player" });
+    }
+    if (!cellPlayer && this.#activeCharacter && red) {
+      const attacker = this.#positionTeamList.find(
+        (el) => el.position === this.#activeCharacter
+      ).character;
+      const target = this.#positionTeamList.find(
+        (el) => el.position === index
+      ).character;
+      const damage = Math.max(
+        attacker.attack - target.defence,
+        attacker.attack * 0.1
+      );
+      this.gamePlay.showDamage(index, damage);
+      target.health = target.health - damage;
     }
   }
 
