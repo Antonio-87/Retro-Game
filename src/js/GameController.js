@@ -97,7 +97,7 @@ export default class GameController {
     return listPosition;
   }
 
-  onCellClick(index) {
+  async onCellClick(index) {
     // TODO: react to click
     const cellPlayer = this.#positionsPlayer.find((el) => el === index);
     const cellComp = this.#positionsComp.find((el) => el === index);
@@ -138,12 +138,7 @@ export default class GameController {
       const target = this.#positionTeamList.find(
         (el) => el.position === index
       ).character;
-      const damage = Math.max(
-        attacker.attack - target.defence,
-        attacker.attack * 0.1
-      );
-      this.gamePlay.showDamage(index, damage);
-      target.health = target.health - damage;
+      this.#attack(attacker, target, index);
     }
   }
 
@@ -157,7 +152,7 @@ export default class GameController {
       character = cell.character;
     }
     if (character) {
-      const message = GameController.getCharacterInfo(character);
+      const message = this.#getCharacterInfo(character);
       this.gamePlay.showCellTooltip(message, index);
     }
     if (this.#activeCharacter) {
@@ -209,7 +204,39 @@ export default class GameController {
     this.gamePlay.hideCellTooltip(index);
   }
 
-  static getCharacterInfo(character) {
+  #getCharacterInfo(character) {
     return `🎖${character.level} ⚔️${character.attack} 🛡${character.defence} ❤️${character.health}`;
+  }
+
+  async #attack(attacker, target, indexTarget) {
+    const damage = Math.max(
+      attacker.attack - target.defence,
+      attacker.attack * 0.1
+    );
+    await this.gamePlay.showDamage(indexTarget, damage);
+    if (target.health > 0) {
+      target.health = target.health - damage;
+      this.gamePlay.redrawPositions(this.#positionTeamList);
+    }
+    if (target.health - damage < 0) {
+      const activeIndexComp = this.#positionsComp.indexOf(indexTarget);
+      const activeIndexPlayer = this.#positionsComp.indexOf(indexTarget);
+      if (activeIndexComp !== -1) {
+        this.#positionsComp.splice(activeIndexComp, 1);
+        this.#gameState = GameState.from({ currentPlayer: "player" });
+      } else {
+        this.#positionsPlayer.splice(activeIndexPlayer, 1);
+        this.#gameState = GameState.from({ currentPlayer: "computer" });
+      }
+      const activeIndexObject = this.#positionTeamList.indexOf(
+        this.#positionTeamList.find((el) => el.position === indexTarget)
+      );
+      this.gamePlay.cells[indexTarget].querySelector(".character").remove();
+      this.#positionTeamList.splice(activeIndexObject, 1);
+      this.gamePlay.redrawPositions(this.#positionTeamList);
+    }
+    this.gamePlay.deselectCell(this.#activeCharacter);
+    this.gamePlay.deselectCell(this.selected);
+    this.#activeCharacter = null;
   }
 }
