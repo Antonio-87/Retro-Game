@@ -50,7 +50,7 @@ export default class GameController {
       (el, index) => new PositionedCharacter(el, this.#positionsComp[index])
     );
 
-    this.#positionTeamList = positionsTeamPlayers.concat(positionsTeamComp);
+    this.#positionTeamList = [...positionsTeamPlayers, ...positionsTeamComp];
     this.gamePlay.redrawPositions(this.#positionTeamList);
     // TODO: add event listeners to gamePlay events
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
@@ -62,39 +62,36 @@ export default class GameController {
   positionsPlayer(count) {
     const positions = [];
     let positionsRandom = new Set([]);
-    let listPosition = [];
+
     let i = 0;
     while (i < this.gamePlay.boardSize ** 2) {
       positions.push(i);
       positions.push(i + 1);
       i += this.gamePlay.boardSize;
     }
-    for (let i = 0; listPosition.length < count; i++) {
+    for (let i = 0; i <= count; i++) {
       positionsRandom.add(
         positions[Math.floor(Math.random() * positions.length)]
       );
-      listPosition = [...positionsRandom];
     }
-    return listPosition;
+    return [...positionsRandom];
   }
 
   positionsComputer(count) {
     const positions = [];
     let positionsRandom = new Set([]);
-    let listPosition = [];
     let i = this.gamePlay.boardSize - 2;
     while (i < this.gamePlay.boardSize ** 2) {
       positions.push(i);
       positions.push(i + 1);
       i += this.gamePlay.boardSize;
     }
-    for (let i = 0; listPosition.length < count; i++) {
+    for (let i = 0; i <= count; i++) {
       positionsRandom.add(
         positions[Math.floor(Math.random() * positions.length)]
       );
-      listPosition = [...positionsRandom];
     }
-    return listPosition;
+    return [...positionsRandom];
   }
 
   async onCellClick(index) {
@@ -220,7 +217,7 @@ export default class GameController {
     }
     if (target.health - damage < 0) {
       const activeIndexComp = this.#positionsComp.indexOf(indexTarget);
-      const activeIndexPlayer = this.#positionsComp.indexOf(indexTarget);
+      const activeIndexPlayer = this.#positionsPlayer.indexOf(indexTarget);
       if (activeIndexComp !== -1) {
         this.#positionsComp.splice(activeIndexComp, 1);
         this.#gameState = GameState.from({ currentPlayer: "player" });
